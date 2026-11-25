@@ -172,9 +172,7 @@ export function plainTextSummary(state: ToolState): string {
       state.discountType === 'percent' ? '%' : ''
     }): -${symbol}${formatMoney(totals.discountAmount)}`
   );
-  lines.push(
-    `Tax (${state.taxRate}% on taxable lines): ${symbol}${formatMoney(totals.taxAmount)}`
-  );
+  lines.push(`Tax (${state.taxRate}% on taxable lines): ${symbol}${formatMoney(totals.taxAmount)}`);
   lines.push(`Grand total: ${symbol}${formatMoney(totals.grandTotal)}`);
   return lines.join('\n');
 }
@@ -202,8 +200,9 @@ export function markdownTable(state: ToolState): string {
  */
 export function nextInvoiceNumber(state: ToolState): string {
   const match = /^(.*?)(\d+)$/.exec(state.invoiceNumber.trim());
-  if (!match) return 'INV-0001';
-  const [, prefix, digits] = match;
+  if (!match || !match[1] || !match[2]) return 'INV-0001';
+  const prefix = match[1];
+  const digits = match[2];
   const next = Number(digits) + 1;
   return `${prefix}${String(next).padStart(digits.length, '0')}`;
 }

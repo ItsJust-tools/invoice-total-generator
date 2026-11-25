@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { generateJsonLd, generateToolMetadata } from '@/lib/seo';
 import toolConfig from '@/tool/tool.config';
 import { getPublicSiteUrl, templateMetadata } from '@/tool/template-metadata';
-import { percentageCalculatorTool } from '@/tool/tool-definition';
+import { invoiceTool } from '@/tool/tool-definition';
 import { Canvas } from '@/tool/components/Canvas';
 import { Sidebar } from '@/tool/components/Sidebar';
 import { Toolbar } from '@/tool/components/Toolbar';
@@ -93,44 +93,29 @@ describe('app and seo', () => {
   it('covers tool definition and helper exports', async () => {
     expect(cn('a', undefined, 'b', false, null, 'c')).toBe('a b c');
     expect(getPublicSiteUrl()).toBe('http://localhost:3000');
-    expect(percentageCalculatorTool.name).toBe(toolConfig.name);
-    expect(
-      percentageCalculatorTool.deserialize({
-        mode: 'change',
-        changeFrom: '80',
-        changeTo: '100',
-        history: [{ text: 'X% of Y: 30', createdAt: '2026-11-21T10:00:00.000Z' }],
-      })
-    ).toEqual({
-      success: true,
-      data: {
-        mode: 'change',
-        percentageOf: BASE_DEFAULT_STATE.percentageOf,
-        ofBase: BASE_DEFAULT_STATE.ofBase,
-        changeFrom: '80',
-        changeTo: '100',
-        reversePart: BASE_DEFAULT_STATE.reversePart,
-        reversePercent: BASE_DEFAULT_STATE.reversePercent,
-        addSubValue: BASE_DEFAULT_STATE.addSubValue,
-        addSubPercent: BASE_DEFAULT_STATE.addSubPercent,
-        addSubOp: BASE_DEFAULT_STATE.addSubOp,
-        compoundA: BASE_DEFAULT_STATE.compoundA,
-        compoundB: BASE_DEFAULT_STATE.compoundB,
-        history: [{ text: 'X% of Y: 30', createdAt: '2026-11-21T10:00:00.000Z' }],
-      },
+    expect(invoiceTool.name).toBe(toolConfig.name);
+    expect(invoiceTool.id).toBe(toolConfig.id);
+    const restored = invoiceTool.deserialize({
+      invoiceNumber: 'INV-0009',
+      items: [{ id: '1', description: 'Design', quantity: '2', unitPrice: '50', taxable: false }],
     });
-    const repaired = percentageCalculatorTool.deserialize({ nope: true });
+    expect(restored.success).toBe(true);
+    if (restored.success) {
+      expect(restored.data.invoiceNumber).toBe('INV-0009');
+      expect(restored.data.currency).toBe(BASE_DEFAULT_STATE.currency);
+      expect(restored.data.items).toHaveLength(1);
+    }
+    const repaired = invoiceTool.deserialize({ nope: true });
     expect(repaired.success).toBe(true);
     if (repaired.success) {
-      expect(repaired.data.mode).toBe(BASE_DEFAULT_STATE.mode);
-      expect(repaired.data.history).toEqual([]);
+      expect(repaired.data.invoiceNumber).toBe(BASE_DEFAULT_STATE.invoiceNumber);
+      expect(repaired.data.items).toEqual([]);
     }
-    expect(
-      percentageCalculatorTool.serialize({ ...BASE_DEFAULT_STATE, changeFrom: '80' })
-    ).toContain('"changeFrom":"80"');
+    expect(invoiceTool.serialize({ ...BASE_DEFAULT_STATE, invoiceNumber: 'INV-0002' })).toContain(
+      '"invoiceNumber":"INV-0002"'
+    );
     const exporters =
-      (percentageCalculatorTool as { exporters?: Array<{ loader: ExporterLoader }> }).exporters ??
-      [];
+      (invoiceTool as { exporters?: Array<{ loader: ExporterLoader }> }).exporters ?? [];
     expect(exporters).toHaveLength(4);
     const first = exporters[0];
     expect(first).toBeDefined();
@@ -151,14 +136,20 @@ describe('app and seo', () => {
         />
         <Sidebar state={{ ...BASE_DEFAULT_STATE }} onChange={() => {}} />
         <Canvas
-          state={{ ...BASE_DEFAULT_STATE, mode: 'of', percentageOf: '20', ofBase: '150' }}
+          state={{
+            ...BASE_DEFAULT_STATE,
+            items: [
+              { id: '1', description: 'Widget', quantity: '2', unitPrice: '10', taxable: true },
+            ],
+            nextId: 2,
+          }}
           onChange={() => {}}
         />
       </>
     );
 
-    expect(screen.getByTestId('mode-tab-of')).toBeInTheDocument();
+    expect(screen.getByTestId('invoice-header')).toBeInTheDocument();
     expect(screen.getByTestId('result-card')).toBeInTheDocument();
-    expect(screen.getByTestId('result-main')).toHaveTextContent('30');
+    expect(screen.getByTestId('grand-total')).toHaveTextContent('20.00');
   });
 });

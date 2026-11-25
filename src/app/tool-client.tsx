@@ -11,7 +11,12 @@ import {
 import { ToolShell, useTool, ImportExport } from '@itsjust/core';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import { toolConfig, templateBaseVersion, Canvas, Toolbar, Sidebar } from '@/tool';
-import { invoiceTool, markdownTable, plainTextSummary, withInvoiceNumberIncremented } from '@/tool/tool-definition';
+import {
+  invoiceTool,
+  markdownTable,
+  plainTextSummary,
+  withInvoiceNumberIncremented,
+} from '@/tool/tool-definition';
 import type { ToolState } from '@/tool/types';
 
 export default function ToolClient() {

@@ -27,5 +27,5 @@ test('tool loads with its configured title', async ({ page }) => {
 test('tool renders main content area', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('main')).toBeVisible();
-  await expect(page.getByRole('toolbar')).toBeVisible();
+  await expect(page.getByRole('toolbar').first()).toBeVisible();
 });

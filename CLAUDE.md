@@ -6,7 +6,7 @@
 
 Single-purpose web tool template built with Next.js App Router. Each tool does ONE thing well — no bloat, no signups.
 
-**Live example:** [itsjust.tools](https://itsjust.tools)
+**Live example:** see the deployed tool URL configured in NEXT_PUBLIC_URL
 
 ## Tech Stack
 
@@ -239,7 +239,7 @@ const shareUrl = `${window.location.origin}${window.location.pathname}?state=<en
 ## Environment Variables
 
 ```bash
-NEXT_PUBLIC_URL=https://your-tool.itsjust.tools
+NEXT_PUBLIC_URL=https://your-tool.example.com
 ```
 
 ## Scripts

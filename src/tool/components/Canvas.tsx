@@ -63,7 +63,10 @@ export const Canvas: React.FC<CanvasProps> = ({
   const symbol = state.currency;
 
   const patchItem = (id: string, patch: Partial<LineItem>) =>
-    onChange?.({ ...state, items: state.items.map((item) => (item.id === id ? { ...item, ...patch } : item)) });
+    onChange?.({
+      ...state,
+      items: state.items.map((item) => (item.id === id ? { ...item, ...patch } : item)),
+    });
 
   const removeItem = (id: string) =>
     onChange?.({ ...state, items: state.items.filter((item) => item.id !== id) });
@@ -317,7 +320,9 @@ export const Canvas: React.FC<CanvasProps> = ({
           {onSaveHistory ? (
             <button
               type="button"
-              onClick={() => onSaveHistory(`${state.invoiceNumber}: ${formatMoney(totals.grandTotal)}`)}
+              onClick={() =>
+                onSaveHistory(`${state.invoiceNumber}: ${formatMoney(totals.grandTotal)}`)
+              }
               data-testid="btn-save-history"
               className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
             >
